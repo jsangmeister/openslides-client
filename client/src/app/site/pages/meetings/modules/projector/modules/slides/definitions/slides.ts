@@ -125,6 +125,13 @@ export const Slides: SlideManifest[] = [
         scrollable: true
     },
     {
+        path: `game`,
+        loadChildren: () => import(`../components/game-slide/game-slide.module`).then(m => m.GameSlideModule),
+        verboseName: _(`Game`),
+        scaleable: false,
+        scrollable: false
+    },
+    {
         path: `projector_countdown`,
         loadChildren: () =>
             import(`../components/projector-countdown-slide/projector-countdown-slide.module`).then(
