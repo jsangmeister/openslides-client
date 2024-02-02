@@ -3,7 +3,6 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { NotifyResponse, NotifyService } from 'src/app/gateways/notify.service';
-import { ProjectionRepositoryService } from 'src/app/gateways/repositories/projections/projection-repository.service';
 import { ProjectorRepositoryService } from 'src/app/gateways/repositories/projectors/projector-repository.service';
 import { ActiveMeetingService } from 'src/app/site/pages/meetings/services/active-meeting.service';
 import { OperatorService } from 'src/app/site/services/operator.service';
@@ -90,31 +89,33 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     /**
      * If the game is currently being watched.
      */
-    protected isWatched: boolean = false;
+    protected isWatched = false;
 
     /**
      * If spectators are allowed to watch the game.
      */
-    private allowSpectators: boolean = true;
+    private allowSpectators = true;
 
     private runningGameStates = {
         receivedRagequit: {
             handle: (): State => {
-                this.caption = this.translate.instant(
-                    `Your opponent couldn't stand it anymore... You are the winner!`
-                );
+                this.caption = this.translate.instant(`Your opponent couldn't stand it anymore... You are the winner!`);
                 return `start`;
             }
         },
         receivedWatchRequest: {
-            handle: (notify: NotifyResponse<{}>) => {
+            handle: (notify: NotifyResponse<null>) => {
                 if (this.allowSpectators) {
-                    this.notifyService.sendToUsers(`${this.prefix}_watch_response`, this.getWatchInformation(), notify.sender_user_id);
+                    this.notifyService.sendToUsers(
+                        `${this.prefix}_watch_response`,
+                        this.getWatchInformation(),
+                        notify.sender_user_id
+                    );
                 }
                 return null;
             }
         }
-    }
+    };
 
     /**
      * This is the state machine for this game :)
@@ -196,7 +197,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     protected notifyService = inject(NotifyService);
     private op = inject(OperatorService);
     protected translate = inject(TranslateService);
-    private projectorRepo = inject(ProjectorRepositoryService)
+    private projectorRepo = inject(ProjectorRepositoryService);
 
     public constructor() {
         this.inMeeting = !!this.activeMeetingService.meetingId;
@@ -238,7 +239,11 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
                 }
             }),
             this.projectorRepo.getViewModelListObservable().subscribe(projectors => {
-                this.isWatched = projectors.some(projector => projector.current_projections.some(projection => projection.type === `game` && projection.options["game_type"] === this.prefix));
+                this.isWatched = projectors.some(projector =>
+                    projector.current_projections.some(
+                        projection => projection.type === `game` && projection.options[`game_type`] === this.prefix
+                    )
+                );
             })
         ];
     }
@@ -272,7 +277,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
             playerAName: this.op.shortName,
             playerBName: this.opponentName,
             boardState: this.getBoardState()
-        }
+        };
     }
 
     /**
