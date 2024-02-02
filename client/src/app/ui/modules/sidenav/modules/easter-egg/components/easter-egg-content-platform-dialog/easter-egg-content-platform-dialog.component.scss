@@ -6,3 +6,7 @@
 .mat-dialog-content {
     max-height: 95vh;
 }
+
+.easter-egg-dialog-container .mat-dialog-container {
+    overflow-y: hidden;
+}

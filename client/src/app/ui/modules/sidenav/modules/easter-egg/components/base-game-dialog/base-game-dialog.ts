@@ -132,18 +132,14 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
         search: {
             receivedSearchRequest: {
                 handle: (notify: NotifyResponse<{ name: string }>) => {
-                    this.replyChannel = notify.sender_channel_id;
-                    this.opponentUserId = notify.sender_user_id;
-                    this.opponentName = notify.message.name;
+                    this.setConnectionInformation(notify);
                     return `waitForResponse`;
                 }
             },
             receivedSearchResponse: {
                 handle: (notify: NotifyResponse<{ name: string }>) => {
-                    this.replyChannel = notify.sender_channel_id;
-                    this.opponentName = notify.message.name;
+                    this.setConnectionInformation(notify);
                     const [message, nextState] = this.startGame();
-                    // send ACK
                     this.notifyService.sendToChannels(`${this.prefix}_ACK`, message, this.replyChannel);
                     return nextState;
                 }
@@ -278,6 +274,12 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
             playerBName: this.opponentName,
             boardState: this.getBoardState()
         };
+    }
+
+    private setConnectionInformation(notify: NotifyResponse<{ name: string }>): void {
+        this.replyChannel = notify.sender_channel_id;
+        this.opponentUserId = notify.sender_user_id;
+        this.opponentName = notify.message.name;
     }
 
     /**

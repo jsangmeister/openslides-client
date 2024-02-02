@@ -16,6 +16,6 @@ export class EasterEggContentPlatformService extends BaseDialogService<
 > {
     public async open(): Promise<MatDialogRef<EasterEggContentPlatformDialogComponent, void>> {
         const module = await import(`../easter-egg.module`).then(m => m.EasterEggModule);
-        return this.dialog.open(module.getContentPlatform(), { ...mediumDialogSettings, disableClose: true });
+        return this.dialog.open(module.getContentPlatform(), { ...mediumDialogSettings });
     }
 }
