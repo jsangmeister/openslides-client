@@ -78,6 +78,10 @@ export class ProjectorDetailComponent extends BaseMeetingComponent implements On
         return !!this.projector.nonStableCurrentProjections;
     }
 
+    public isGameAvailable(game: string): boolean {
+        return true;
+    }
+
     public get currentProjectionIsLoS(): boolean {
         for (const projection of this.projector.nonStableCurrentProjections) {
             if (hasListOfSpeakers(projection.content_object)) {
@@ -266,7 +270,7 @@ export class ProjectorDetailComponent extends BaseMeetingComponent implements On
         return this.currentListOfSpeakersSlideService.getProjectionBuildDescriptor(overlay);
     }
 
-    public getGameBuildDesc(game: string): Promise<void> {
+    public toggleGameProjection(game: string): Promise<void> {
         return this.easterEggService.toggleOn(this.projector, game);
     }
 

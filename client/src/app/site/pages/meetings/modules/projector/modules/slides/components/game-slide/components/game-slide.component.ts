@@ -31,7 +31,7 @@ export class GameSlideComponent extends BaseSlideComponent<GameSlideData> implem
             language: this.translate.currentLang == `de` ? `de` : `en`,
             assetsUrl: `./chess/`,
             style: {
-                borderType: BORDER_TYPE.frame,
+                borderType: BORDER_TYPE.frame
             }
         });
     }

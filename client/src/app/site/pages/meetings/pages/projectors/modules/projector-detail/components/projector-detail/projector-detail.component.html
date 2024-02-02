@@ -418,17 +418,17 @@
                     </mat-expansion-panel>
 
                     <!-- Current list of speakers -->
-                    <mat-expansion-panel>
+                    <mat-expansion-panel *ngIf="isGameAvailable('c4') || isGameAvailable('chess')">
                         <mat-expansion-panel-header>
                             <span>{{ 'Games' | translate }}</span>
                         </mat-expansion-panel-header>
 
                         <!-- Chess -->
-                        <mat-list>
+                        <mat-list *ngIf="isGameAvailable('chess')">
                             <mat-list-item>
                                 <button
                                     mat-mini-fab
-                                    (click)="getGameBuildDesc('chess')"
+                                    (click)="toggleGameProjection('chess')"
                                 >
                                     <mat-icon>videocam</mat-icon>
                                 </button>
@@ -438,11 +438,11 @@
                         </mat-list>
 
                         <!-- C4 -->
-                        <mat-list>
+                        <mat-list *ngIf="isGameAvailable('c4')">
                             <mat-list-item>
                                 <button
                                     mat-mini-fab
-                                    (click)="getGameBuildDesc('c4')"
+                                    (click)="toggleGameProjection('c4')"
                                 >
                                     <mat-icon>videocam</mat-icon>
                                 </button>
