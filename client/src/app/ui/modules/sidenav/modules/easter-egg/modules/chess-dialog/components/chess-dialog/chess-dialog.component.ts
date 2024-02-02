@@ -97,7 +97,7 @@ export class ChessDialogComponent extends BaseGameDialogComponent implements OnI
         if (message !== undefined) {
             this.ownColor = message;
         } else {
-            this.ownColor = Math.random() < 0.5 ? COLOR.white : COLOR.black;
+            this.ownColor = COLOR.white;//Math.random() < 0.5 ? COLOR.white : COLOR.black;
             result = this.ownColor === COLOR.white ? COLOR.black : COLOR.white;
         }
         this.board.setOrientation(this.ownColor);

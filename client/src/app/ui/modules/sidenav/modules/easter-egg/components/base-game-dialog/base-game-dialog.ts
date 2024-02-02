@@ -73,6 +73,11 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     private opponentUserId: number | null = null;
 
     /**
+     * Whether the operator is the first player.
+     */
+    protected isFirstPlayer: boolean = true;
+
+    /**
      * A timeout to go from waiting to search state.
      */
     private waitTimout: number | null = null;
@@ -96,6 +101,22 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
      * If spectators are allowed to watch the game.
      */
     private allowSpectators = true;
+
+    private get firstPlayerId(): number {
+        return this.isFirstPlayer ? this.op.operatorId : this.opponentUserId!;
+    }
+
+    private get secondPlayerId(): number {
+        return this.isFirstPlayer ? this.opponentUserId! : this.op.operatorId;
+    }
+
+    private get firstPlayerName(): string {
+        return this.isFirstPlayer ? this.op.shortName : this.opponentName!;
+    }
+
+    private get secondPlayerName(): string {
+        return this.isFirstPlayer ? this.opponentName! : this.op.shortName;
+    }
 
     private runningGameStates = {
         receivedRagequit: {
@@ -169,7 +190,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
                 handle: (move: any) => {
                     const nextState = this.executeMove(move, true);
                     this.notifyService.sendToChannels(`${this.prefix}_move`, move, this.replyChannel!);
-                    if (this.isWatched) {
+                    if (true) {//this.isWatched) {
                         this.notifyService.sendToMeeting(`${this.prefix}_game_update`, this.getWatchInformation());
                     }
                     return nextState;
@@ -272,10 +293,10 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
 
     private getWatchInformation(): any {
         return {
-            playerAId: this.op.user.id,
-            playerBId: this.opponentUserId,
-            playerAName: this.op.shortName,
-            playerBName: this.opponentName,
+            firstPlayerId: this.firstPlayerId,
+            secondPlayerId: this.secondPlayerId,
+            firstPlayerName: this.firstPlayerName,
+            secondPlayerName: this.secondPlayerName,
             boardState: this.getBoardState()
         };
     }

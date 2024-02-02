@@ -8,7 +8,6 @@ export class StreamHandler<T> {
     }
 
     private _currentActiveStream: HttpStream<T> | null = null;
-    private _refreshTimer: NodeJS.Timeout | null = null;
 
     private readonly _afterOpenedFn: AfterEventFn | undefined;
     private readonly _afterClosedFn: AfterEventFn | undefined;
@@ -27,9 +26,6 @@ export class StreamHandler<T> {
     public closeCurrentStream(): void {
         const stream = this._currentActiveStream;
         this.destroyStream();
-        if (this._refreshTimer) {
-            clearInterval(this._refreshTimer);
-        }
         if (this._afterClosedFn && stream) {
             this._afterClosedFn(stream);
         }
@@ -37,9 +33,6 @@ export class StreamHandler<T> {
 
     public openCurrentStream(): void {
         this.reboot();
-        if (!this._refreshTimer) {
-            this._refreshTimer = setInterval(() => this.reboot(), 1000 * 60 * 30); // 30 min
-        }
         if (this._afterOpenedFn && this._currentActiveStream) {
             this._afterOpenedFn(this._currentActiveStream);
         }

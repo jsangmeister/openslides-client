@@ -56,6 +56,6 @@ export class EasterEggSlideService {
         if (!descriptor) {
             return;
         }
-        this.projectorService.toggle(descriptor, [projector], { game });
+        this.projectorService.toggle(descriptor, [projector], { game, firstPlayerId: 1, firstPlayerName: "1", secondPlayerId: 2, secondPlayerName: "2" });
     }
 }

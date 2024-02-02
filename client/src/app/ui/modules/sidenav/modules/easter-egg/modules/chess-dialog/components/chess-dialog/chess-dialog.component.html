@@ -6,9 +6,7 @@
         </button>
     </div>
     <div *ngIf="opponentName" class="center spacer-top-5">{{ 'Playing against' | translate }} {{ opponentName }}</div>
-    <div class="center spacer-top-5">
-        <div id="chessboard" #chessboard></div>
-    </div>
+    <div id="chessboard" #chessboard class="spacer-top-5"></div>
     <div *ngIf="inMeeting && state === 'start'" class="center spacer-top-5">
         <button (click)="handleEvent('searchClicked')" mat-raised-button color="accent">
             {{ 'Search player' | translate }}

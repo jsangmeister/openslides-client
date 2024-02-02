@@ -4,6 +4,7 @@ import { BORDER_TYPE, Chessboard } from 'cm-chessboard/src/Chessboard';
 
 import { BaseSlideComponent } from '../../../base/base-slide-component';
 import { GameSlideData } from '../game-slide-data';
+import { NotifyService } from 'src/app/gateways/notify.service';
 
 @Component({
     selector: `os-game-slide`,
@@ -21,18 +22,24 @@ export class GameSlideComponent extends BaseSlideComponent<GameSlideData> implem
     @ViewChild(`board`, { static: true })
     public boardContainer: ElementRef;
 
-    public constructor(private translate: TranslateService) {
+    private board: Chessboard = null;
+
+    public constructor(private translate: TranslateService, private notify: NotifyService) {
         super();
     }
 
-    ngOnInit() {
-        new Chessboard(this.boardContainer.nativeElement, {
+    public ngOnInit() {
+        this.board = new Chessboard(this.boardContainer.nativeElement, {
             position: this.currentState,
             language: this.translate.currentLang == `de` ? `de` : `en`,
             assetsUrl: `./chess/`,
             style: {
                 borderType: BORDER_TYPE.frame
             }
+        });
+        this.notify.getMessageObservable<{ boardState: string }>(`chess_game_update`).subscribe(notify => {
+            this.currentState = notify.message.boardState;
+            this.board.setPosition(this.currentState, false);
         });
     }
 }
