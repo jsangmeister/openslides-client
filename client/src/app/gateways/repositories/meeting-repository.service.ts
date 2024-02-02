@@ -22,7 +22,8 @@ export enum MeetingProjectionType {
     CurrentSpeakingStructureLevel = `current_speaking_structure_level`,
     CurrentStructureLevelList = `current_structure_level_list`,
     AgendaItemList = `agenda_item_list`,
-    WiFiAccess = `wifi_access_data`
+    WiFiAccess = `wifi_access_data`,
+    EasterEgg = `game`
 }
 
 export interface ImportMeeting {
