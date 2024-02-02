@@ -15,4 +15,7 @@
     <div *ngIf="!inMeeting">
         {{ 'Open a meeting to play chess' | translate }}
     </div>
+    <mat-checkbox [disabled]="isWatched" (change)="onAllowSpectatorsChange($event)">
+        {{ 'Allow spectators' | translate }}
+    </mat-checkbox>
 </div>

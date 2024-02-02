@@ -7,6 +7,7 @@ import { OpenSlidesTranslationModule } from 'src/app/site/modules/translations';
 import { PromptDialogModule, PromptService } from 'src/app/ui/modules/prompt-dialog';
 
 import { ChessDialogComponent } from './components/chess-dialog/chess-dialog.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
     declarations: [ChessDialogComponent],
@@ -15,6 +16,7 @@ import { ChessDialogComponent } from './components/chess-dialog/chess-dialog.com
         MatButtonModule,
         MatIconModule,
         MatDialogModule,
+        MatCheckboxModule,
         OpenSlidesTranslationModule.forChild(),
         PromptDialogModule
     ],

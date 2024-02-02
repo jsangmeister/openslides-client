@@ -1,7 +1,10 @@
 import { Directive, inject, OnDestroy, OnInit } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { NotifyResponse, NotifyService } from 'src/app/gateways/notify.service';
+import { ProjectionRepositoryService } from 'src/app/gateways/repositories/projections/projection-repository.service';
+import { ProjectorRepositoryService } from 'src/app/gateways/repositories/projectors/projector-repository.service';
 import { ActiveMeetingService } from 'src/app/site/pages/meetings/services/active-meeting.service';
 import { OperatorService } from 'src/app/site/services/operator.service';
 
@@ -21,7 +24,8 @@ export type StateEvent =
     | 'waitTimeout'
     | 'executedMove'
     | 'receivedMove'
-    | 'receivedRagequit';
+    | 'receivedRagequit'
+    | 'receivedWatchRequest';
 
 /**
  * An action in one state.
@@ -64,12 +68,17 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     public opponentName: string | null = null;
 
     /**
+     * The opponents user id.
+     */
+    private opponentUserId: number | null = null;
+
+    /**
      * A timeout to go from waiting to search state.
      */
     private waitTimout: number | null = null;
 
     /**
-     * A list of all subscriptions, so they can b unsubscribed on desroy.
+     * A list of all subscriptions, so they can be unsubscribed on destroy.
      */
     private subscriptions: Subscription[] = [];
 
@@ -77,6 +86,35 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
      * The current state of the state machine.
      */
     public state: State = `search`;
+
+    /**
+     * If the game is currently being watched.
+     */
+    protected isWatched: boolean = false;
+
+    /**
+     * If spectators are allowed to watch the game.
+     */
+    private allowSpectators: boolean = true;
+
+    private runningGameStates = {
+        receivedRagequit: {
+            handle: (): State => {
+                this.caption = this.translate.instant(
+                    `Your opponent couldn't stand it anymore... You are the winner!`
+                );
+                return `start`;
+            }
+        },
+        receivedWatchRequest: {
+            handle: (notify: NotifyResponse<{}>) => {
+                if (this.allowSpectators) {
+                    this.notifyService.sendToUsers(`${this.prefix}_watch_response`, this.getWatchInformation(), notify.sender_user_id);
+                }
+                return null;
+            }
+        }
+    }
 
     /**
      * This is the state machine for this game :)
@@ -94,6 +132,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
             receivedSearchRequest: {
                 handle: (notify: NotifyResponse<{ name: string }>) => {
                     this.replyChannel = notify.sender_channel_id;
+                    this.opponentUserId = notify.sender_user_id;
                     this.opponentName = notify.message.name;
                     return `waitForResponse`;
                 }
@@ -132,17 +171,13 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
                 handle: (move: any) => {
                     const nextState = this.executeMove(move, true);
                     this.notifyService.sendToChannels(`${this.prefix}_move`, move, this.replyChannel!);
+                    if (this.isWatched) {
+                        this.notifyService.sendToMeeting(`${this.prefix}_game_update`, this.getWatchInformation());
+                    }
                     return nextState;
                 }
             },
-            receivedRagequit: {
-                handle: () => {
-                    this.caption = this.translate.instant(
-                        `Your opponent couldn't stand it anymore... You are the winner!`
-                    );
-                    return `start`;
-                }
-            }
+            ...this.runningGameStates
         },
         opponentMove: {
             receivedMove: {
@@ -153,14 +188,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
                     return this.executeMove(notify.message);
                 }
             },
-            receivedRagequit: {
-                handle: () => {
-                    this.caption = this.translate.instant(
-                        `Your opponent couldn't stand it anymore... You are the winner!`
-                    );
-                    return `start`;
-                }
-            }
+            ...this.runningGameStates
         }
     };
 
@@ -168,6 +196,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     protected notifyService = inject(NotifyService);
     private op = inject(OperatorService);
     protected translate = inject(TranslateService);
+    private projectorRepo = inject(ProjectorRepositoryService)
 
     public constructor() {
         this.inMeeting = !!this.activeMeetingService.meetingId;
@@ -202,6 +231,14 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
                 if (!notify.sendByThisUser) {
                     this.handleEvent(`receivedMove`, notify);
                 }
+            }),
+            this.notifyService.getMessageObservable(`${this.prefix}_watch_request`).subscribe(notify => {
+                if (!notify.sendByThisUser) {
+                    this.handleEvent(`receivedWatchRequest`, notify);
+                }
+            }),
+            this.projectorRepo.getViewModelListObservable().subscribe(projectors => {
+                this.isWatched = projectors.some(projector => projector.current_projections.some(projection => projection.type === `game` && projection.options["game_type"] === this.prefix));
             })
         ];
     }
@@ -219,6 +256,24 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     protected abstract startGame(message?: any): [any, State];
 
     protected abstract executeMove(move: any, ownMove?: boolean): State | null;
+
+    protected abstract getBoardState(): any;
+
+    protected onAllowSpectatorsChange(event: MatCheckboxChange) {
+        if (!this.isWatched) {
+            this.allowSpectators = event.checked;
+        }
+    }
+
+    private getWatchInformation(): any {
+        return {
+            playerAId: this.op.user.id,
+            playerBId: this.opponentUserId,
+            playerAName: this.op.shortName,
+            playerBName: this.opponentName,
+            boardState: this.getBoardState()
+        }
+    }
 
     /**
      * Returns the operators name.

@@ -84,8 +84,12 @@ export class ChessDialogComponent extends BaseGameDialogComponent implements OnI
         }
     }
 
-    protected override reset(): void {
+    protected reset(): void {
         this.chess.load(FEN.start);
+    }
+
+    protected getBoardState(): any {
+        return this.chess.fen();
     }
 
     protected startGame(message?: any): [any, State] {

@@ -65,6 +65,10 @@ export class C4DialogComponent extends BaseGameDialogComponent implements OnInit
         }
     }
 
+    protected getBoardState(): any {
+        return this.board;
+    }
+
     protected startGame(message?: any): [any, State] {
         if (message !== undefined) {
             const state = message ? `ownMove` : `opponentMove`;
