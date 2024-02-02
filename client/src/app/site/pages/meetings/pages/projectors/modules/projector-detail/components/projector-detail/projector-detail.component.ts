@@ -18,6 +18,7 @@ import { DurationService } from 'src/app/site/services/duration.service';
 import { OperatorService } from 'src/app/site/services/operator.service';
 import { GridTileDimension } from 'src/app/ui/modules/grid';
 import { PromptService } from 'src/app/ui/modules/prompt-dialog';
+import { EasterEggSlideService } from 'src/app/ui/modules/sidenav/modules/easter-egg/services/easter-egg-slide.service';
 
 import { hasListOfSpeakers, ViewListOfSpeakers } from '../../../../../agenda';
 import { CurrentListOfSpeakersSlideService } from '../../../../../agenda/modules/list-of-speakers/services/current-list-of-speakers-slide.service';
@@ -77,6 +78,10 @@ export class ProjectorDetailComponent extends BaseMeetingComponent implements On
         return !!this.projector.nonStableCurrentProjections;
     }
 
+    public isGameAvailable(game: string): boolean {
+        return true;
+    }
+
     public get currentProjectionIsLoS(): boolean {
         for (const projection of this.projector.nonStableCurrentProjections) {
             if (hasListOfSpeakers(projection.content_object)) {
@@ -113,6 +118,7 @@ export class ProjectorDetailComponent extends BaseMeetingComponent implements On
         private currentListOfSpeakersSlideService: CurrentListOfSpeakersSlideService,
         private currentStructureLevelListSlideService: CurrentStructureLevelListSlideService,
         private currentSpeakingStructureLevelSlideService: CurrentSpeakingStructureLevelSlideService,
+        private easterEggService: EasterEggSlideService,
         private currentSpeakerChyronService: CurrentSpeakerChyronSlideService,
         private projectorEditDialog: ProjectorEditDialogService,
         private projectorMessageDialog: ProjectorMessageDialogService,
@@ -262,6 +268,10 @@ export class ProjectorDetailComponent extends BaseMeetingComponent implements On
 
     public getCurrentLoSBuildDesc(overlay: boolean): ProjectionBuildDescriptor {
         return this.currentListOfSpeakersSlideService.getProjectionBuildDescriptor(overlay);
+    }
+
+    public toggleGameProjection(game: string): Promise<void> {
+        return this.easterEggService.toggleOn(this.projector, game);
     }
 
     public getCurrentStructureLevel(): ProjectionBuildDescriptor {

@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { NotifyResponse, NotifyService } from 'src/app/gateways/notify.service';
 import { ProjectorRepositoryService } from 'src/app/gateways/repositories/projectors/projector-repository.service';
+import { StorageService } from 'src/app/gateways/storage.service';
 import { ActiveMeetingService } from 'src/app/site/pages/meetings/services/active-meeting.service';
 import { OperatorService } from 'src/app/site/services/operator.service';
 
@@ -194,6 +195,7 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
     private op = inject(OperatorService);
     protected translate = inject(TranslateService);
     private projectorRepo = inject(ProjectorRepositoryService);
+    private storage = inject(StorageService);
 
     public constructor() {
         this.inMeeting = !!this.activeMeetingService.meetingId;
@@ -242,6 +244,8 @@ export abstract class BaseGameDialogComponent implements OnInit, OnDestroy {
                 );
             })
         ];
+
+        this.storage.set(`game_opened_${this.prefix}`, 1);
     }
 
     public ngOnDestroy(): void {

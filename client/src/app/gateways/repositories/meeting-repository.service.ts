@@ -22,7 +22,8 @@ export enum MeetingProjectionType {
     CurrentSpeakingStructureLevel = `current_speaking_structure_level`,
     CurrentStructureLevelList = `current_structure_level_list`,
     AgendaItemList = `agenda_item_list`,
-    WiFiAccess = `wifi_access_data`
+    WiFiAccess = `wifi_access_data`,
+    EasterEgg = `game`
 }
 
 export interface ImportMeeting {
@@ -117,6 +118,9 @@ export class MeetingRepositoryService extends BaseRepository<ViewMeeting, Meetin
                 break;
             case MeetingProjectionType.WiFiAccess:
                 title = this.translate.instant(`Wifi access data`);
+                break;
+            case MeetingProjectionType.EasterEgg:
+                title = this.translate.instant(`Game`);
                 break;
             default:
                 console.warn(`Unknown slide type for meeting:`, projection.type);

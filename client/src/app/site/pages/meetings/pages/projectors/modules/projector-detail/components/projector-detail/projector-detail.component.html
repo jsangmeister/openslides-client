@@ -417,6 +417,42 @@
                         </mat-list>
                     </mat-expansion-panel>
 
+                    <!-- Current list of speakers -->
+                    <mat-expansion-panel *ngIf="isGameAvailable('c4') || isGameAvailable('chess')">
+                        <mat-expansion-panel-header>
+                            <span>{{ 'Games' | translate }}</span>
+                        </mat-expansion-panel-header>
+
+                        <!-- Chess -->
+                        <mat-list *ngIf="isGameAvailable('chess')">
+                            <mat-list-item>
+                                <button
+                                    mat-mini-fab
+                                    (click)="toggleGameProjection('chess')"
+                                >
+                                    <mat-icon>videocam</mat-icon>
+                                </button>
+
+                                <span class="spacer-left-10">{{ 'Chess' | translate }}</span>
+                            </mat-list-item>
+                        </mat-list>
+
+                        <!-- C4 -->
+                        <mat-list *ngIf="isGameAvailable('c4')">
+                            <mat-list-item>
+                                <button
+                                    mat-mini-fab
+                                    (click)="toggleGameProjection('c4')"
+                                >
+                                    <mat-icon>videocam</mat-icon>
+                                </button>
+
+                                <span class="spacer-left-10">{{ 'C4' | translate }}</span>
+                            </mat-list-item>
+                        </mat-list>
+                    </mat-expansion-panel>
+
+
                     <!-- Current slide -->
                     <mat-expansion-panel *ngIf="hasSlide">
                         <mat-expansion-panel-header>
